@@ -19,13 +19,15 @@ spring:
 
   ai:
     openai:
-      api-key: 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
+      api-key: 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
       base-url: https://openrouter.ai/api/
       chat:
         options:
-          #          model: openai/gpt-oss-120b:free
-          model: nvidia/nemotron-3-super-120b-a12b:free
+          #          model: nvidia/nemotron-3-super-120b-a12b:free
+          model: nvidia/nemotron-3-ultra-550b-a55b:free
           #          model: google/gemma-4-26b-a4b-it:free
+          #          model : google/gemma-4-31b-it:free
+          #          model: thinkingmachines/inkling-small:free
           temperature: 0.0
 
 jwt:
@@ -42,8 +44,14 @@ client:
 
 logging:
   level:
-    org.springframework.ai:
-      chat.client: DEBUG
+    org:
+      springframework:
+        ai:
+          chat.client: DEBUG
+          openai: DEBUG
+        web:
+          client: DEBUG
+
 
 minio:
   url: http://localhost:9000
