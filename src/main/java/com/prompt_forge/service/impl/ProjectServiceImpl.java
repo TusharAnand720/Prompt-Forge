@@ -110,6 +110,7 @@ public class ProjectServiceImpl implements ProjectService {
     public void deleteProject(Long projectId) {
         Long userId = authUtil.getCurrentUserId();
         Project project = getAccessibleProjectById(projectId, userId);
+        project.setIsActive(false);
         project.setDeletedAt(Instant.now());
         projectRepository.save(project);
     }
