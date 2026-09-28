@@ -27,6 +27,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     AuthUtil authUtil;
 
     UserMapper userMapper;
+
     
     @Override
     public UserProfileResponse getProfile() {
