@@ -18,6 +18,7 @@ import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +29,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 @Transactional
+@Slf4j
 public class ProjectMemberServiceImpl implements ProjectMemberService {
 
     ProjectMemberRepository projectMemberRepository;
@@ -58,14 +60,17 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
 
         Project project = getAccessibleProjectById(projectId, userId);
 
-        User invitee = userRepository.findByUsername(request.username()).orElseThrow();
+        User invitee = userRepository.findByUsername(request.username())
+                .orElseThrow(() -> new ResourceNotFoundException("username", request.username()));
+
         if (invitee.getId().equals(userId)) {
-            throw new RuntimeException("Cannot invite yourself");
+            log.error("User {} is trying to invite themselves to project {}", userId, projectId);
+            throw new RuntimeException("You cannot invite yourself to the project");
         }
 
         ProjectMemberId projectMemberId = new ProjectMemberId(projectId, invitee.getId());
         if (projectMemberRepository.existsById(projectMemberId)) {
-            throw new RuntimeException("Connot invite once again");
+            throw new RuntimeException("User is already a member of the project");
         }
 
         ProjectMember projectMember = ProjectMember.builder()
