@@ -1,0 +1,24 @@
+==> kind create cluster --name promptforge-ai
+Creates a new local Kubernetes cluster running inside a Docker container (that's what kind = "Kubernetes IN Docker" does).
+--name promptforge-ai names it so you can run multiple separate clusters on the same machine and distinguish them.
+This also automatically updates your kubeconfig and switches your current kubectl context to the new cluster.
+
+==> kind get clusters
+Lists all kind clusters currently running on your machine (just the names, one per line).
+Useful for checking whether a cluster exists at all before troubleshooting kubectl connection errors —
+if the name you expect isn't in this list, that cluster doesn't exist (which is exactly what we hit earlier when your cluster had been deleted).
+
+==> kubectl get services -n promptforge-apps
+Lists all Kubernetes Service objects in the promptforge-apps namespace — shows name, type (ClusterIP/ExternalName/etc.),
+internal cluster IP, external IP (if any), and exposed ports. -n <namespace> scopes the query to that one namespace instead of just default.
+
+==> kubectl get pods -n promptforge-apps
+Lists all running Pods in that namespace — shows name, READY (containers ready / total containers, e.g. 2/2),
+STATUS (Running, Pending, ImagePullBackOff, etc.), RESTARTS, and AGE.
+This is usually the first command you run to check overall health of a namespace.
+
+==> kubectl describe pod redis-server-7b66695cf-rfvtk -n promptforge-apps
+Shows full details of one specific pod by name: its labels, containers, images, resource requests/limits, volumes, node
+it's scheduled on, current status/conditions, and — critically —
+the Events section at the bottom, which is the event log (scheduling, image pulls, container starts, crashes, errors) that tells you why a pod is failing.
+This is the command you reach for when get pods shows something unhealthy and you need to know the root cause.
