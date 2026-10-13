@@ -6,3 +6,5 @@ resources:
   - minio-service.yml
   - redis.yml
   - runner-pool.yml
+  - policy.yml
+  - proxy.yml

@@ -11,20 +11,28 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: true
+    #    show-sql: true
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
-        format_sql: false
+  #        format_sql: false
 
+  data:
+    redis:
+      host: localhost
+      port: 6379
+  
+  
   ai:
     openai:
-      api-key: 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
+      api-key:
       base-url: https://openrouter.ai/api/
       chat:
         options:
           #          model: nvidia/nemotron-3-super-120b-a12b:free
-          model: nvidia/nemotron-3-ultra-550b-a55b:free
+          #          model: qwen/qwen3.8-27b:free
+          model: google/gemini-3.8-flash
+          #          model: nvidia/nemotron-3-ultra-550b-a55b:free
           #          model: google/gemma-4-26b-a4b-it:free
           #          model : google/gemma-4-31b-it:free
           #          model: thinkingmachines/inkling-small:free

@@ -8,6 +8,7 @@ import io.fabric8.kubernetes.client.dsl.ExecListener;
 import io.fabric8.kubernetes.client.dsl.ExecWatch;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
@@ -30,6 +31,7 @@ public class KubernetesDeploymentServiceImpl implements DeploymentService {
     private static final String REVERSE_PROXY_PORT = "8090";
 
     private final KubernetesClient kubernetesClient;
+    private final StringRedisTemplate redisTemplate;
 
     @Override
     public DeployResponse deploy(Long projectId) {
@@ -39,6 +41,7 @@ public class KubernetesDeploymentServiceImpl implements DeploymentService {
         Pod existingPod = findActivePod(projectId);
 
         if (existingPod != null) {
+            registerRoute(domain, existingPod);
             log.info("Found existing active pod for project {}: {}", projectId, existingPod.getMetadata().getName());
             return new DeployResponse("http://" + domain + ":" + REVERSE_PROXY_PORT);
         }
@@ -90,12 +93,27 @@ public class KubernetesDeploymentServiceImpl implements DeploymentService {
                 String startAppCmd = "npm install && nohup npm run dev -- --host 0.0.0.0 --port 5173 > /app/dev.log 2>&1 &";
                 log.info("Starting project application {} in runner container of pod {}: {}", projectId, podName, startAppCmd);
                 execCommand(podName, RUNNER_CONTAINER, "sh", "-c", startAppCmd);
+
+                registerRoute(domain, idlePod);
+                log.info("Registered route for project {}: http://{}:{}", projectId, domain, REVERSE_PROXY_PORT);
             }
             return new DeployResponse("http://" + domain + ":" + REVERSE_PROXY_PORT);
         } catch (Exception e) {
             log.error("Error during deployment of project {}: {}", projectId, e.getMessage());
             throw new RuntimeException(e);
         }
+    }
+
+    private void registerRoute(String domain, Pod pod) {
+        String podIp = pod.getStatus().getPodIP();
+        if (podIp == null || podIp.isEmpty()) {
+            log.warn("Pod IP is null or empty for pod: {}", pod.getMetadata().getName());
+            throw new RuntimeException("Pod IP is null or empty for pod: " + pod.getMetadata().getName());
+        }
+
+        String key = "route:" + domain;
+        String value = podIp + ":5173";
+        redisTemplate.opsForValue().set(key, value, 6, TimeUnit.HOURS);
     }
 
     private void execCommand(String podName, String container, String... commands) {
