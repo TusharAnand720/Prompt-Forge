@@ -1,0 +1,12 @@
+==> docker compose -f services.docker-compose.yml up
+Creates and starts all containers defined in the services.docker-compose.yml file, using the specified configuration.
+This command will run in the foreground and display logs from all containers.
+
+==> docker build -t promptforge-proxy:latest .
+Creates a Docker image named "promptforge-proxy" with the "latest" tag using the Dockerfile in the current directory.
+
+==> docker build -t promptforge-proxy:latest -f proxy/Dockerfile proxy/
+Creates a Docker image named "promptforge-proxy" with the "latest" tag using the Dockerfile located in the "proxy" directory.
+
+==> kind load docker-image promptforge-proxy:latest --name promptforge-ai
+Loads the Docker image "promptforge-proxy:latest" into the Kind cluster named "promptforge-ai".

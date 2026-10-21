@@ -1,5 +1,6 @@
 package com.prompt_forge.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.prompt_forge.enums.ChatEventType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -36,6 +37,7 @@ public class ChatEvent {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)
+    @JsonBackReference
     ChatMessage chatMessage;
 
     @Enumerated(EnumType.STRING)

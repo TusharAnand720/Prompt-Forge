@@ -1,0 +1,18 @@
+==> kind create cluster --name promptforge-ai
+Creates a cluster named promptforge-ai using kind (Kubernetes in Docker).
+
+==> docker compose -f services.docker-compose.yml up
+Creates and starts the services defined in the services.docker-compose.yml file.
+
+==> docker build -t promptforge-proxy:latest . || docker build -t promptforge-proxy:latest -f proxy/Dockerfile proxy/
+Creates a Docker image named promptforge-proxy:latest using the Dockerfile in the current directory or the proxy directory.
+
+==> kind load docker-image promptforge-proxy:latest --name promptforge-ai
+Loads the docker image into promptforge-ai cluster
+
+==> kubectl apply -k .
+
+==> kubectl port-forward svc/redis-service 6379:6379 -n promptforge-apps
+
+==> kubectl port-forward pod/<promptforge-proxy-pod-name> 8090:80 -n promptforge-apps
+(optional if we want to port forward the pod to access project from localhost)

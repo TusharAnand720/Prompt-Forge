@@ -1,5 +1,6 @@
 package com.prompt_forge.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.prompt_forge.enums.MessageRole;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -55,6 +56,7 @@ public class ChatMessage {
 
     @OneToMany(mappedBy = "chatMessage", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @OrderBy("sequenceOrder ASC")
+    @JsonManagedReference
     List<ChatEvent> events; // empty unless ASSISTANT role
 
     @Column(columnDefinition = "text")
